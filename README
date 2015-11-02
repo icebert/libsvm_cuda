@@ -9,6 +9,19 @@ properly installed. This tool requires a minimum of 4GB GPU memory.
 
 
 
+## Build ##
+cd libsvm_cuda
+make
+
+## Run ##
+Options: 
+./svm-train-gpu -h
+
+Example: find cost (C) in SVM with linear kernel
+./svm-train-gpu -t 0 -C ./heart_scale 
+
+
+
 Libsvm is a simple, easy-to-use, and efficient software for SVM
 classification and regression. It solves C-SVM classification, nu-SVM
 classification, one-class-SVM, epsilon-SVM regression, and nu-SVM
