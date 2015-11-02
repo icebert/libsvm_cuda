@@ -1,0 +1,21 @@
+Extended libSVM with parallelized cross-validation
+
+
+When performing corss-validation (CV), this tool will utilize mutli-cores
+to speed up the CV process. It utilizes the same number of threads as the
+fold of CV (For 10 fold corss-validation, it will use 10 threads).
+
+The multiple threads implementation is based on OpenMP.
+
+
+
+Libsvm is a simple, easy-to-use, and efficient software for SVM
+classification and regression. It solves C-SVM classification, nu-SVM
+classification, one-class-SVM, epsilon-SVM regression, and nu-SVM
+regression. It also provides an automatic model selection tool for
+C-SVM classification. This document explains the use of libsvm.
+
+Libsvm is available at 
+http://www.csie.ntu.edu.tw/~cjlin/libsvm
+Please read the COPYRIGHT file before using libsvm.
+
