@@ -2999,13 +2999,14 @@ int cuda_svm_train(const struct svm_problem *h_prob, struct svm_problem *h_subpr
         //
         int dev;
         int max_dev;
-        int max_avail = 0;
+        size_t max_avail = 0;
         for (dev=0; dev<dev_cnt; dev++)
         {
             size_t avail;
             size_t total;
             cudaSetDevice(dev);
             cudaMemGetInfo(&avail, &total);
+            cudaDeviceReset();
             if (avail > max_avail)
             {
                 max_dev = dev;
