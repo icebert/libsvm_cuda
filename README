@@ -13,12 +13,21 @@ properly installed. This tool requires a minimum of 4GB GPU memory.
 cd libsvm_cuda
 make
 
+## Build with NVML ##
+make NVML_LIB=<nvml lib path>
+
+Example: make NVML_LIB=/usr/lib/nvidia-352
+
+
 ## Run ##
 Options: 
 ./svm-train-gpu -h
 
+Example: find best combination of cost (C) and gamma (g):
+./svm-train-gpu -C -5,15,2 -G 3,-15,-2 ./heart_scale 
+
 Example: find cost (C) in SVM with linear kernel
-./svm-train-gpu -t 0 -C ./heart_scale 
+./svm-train-gpu -t 0 -C -5,15,2 ./heart_scale 
 
 
 

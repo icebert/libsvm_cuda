@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <cuda_runtime.h>
 
+#ifdef NVML
+#include "nvml.h"
+#endif
+
 #include "svm.h"
 #include "cuda_svm.h"
 
@@ -2992,30 +2996,34 @@ int cuda_svm_train(const struct svm_problem *h_prob, struct svm_problem *h_subpr
          fprintf(stderr, "No CUDA device\n");
          return 1;
     }
+#ifdef NVML
     if (dev_cnt > 1)
     {
         //
         // Choose device that has maximum device memory left
         //
-        int dev;
         int max_dev;
         size_t max_avail = 0;
-        for (dev=0; dev<dev_cnt; dev++)
+        nvmlInit();
+        for (i=0; i<dev_cnt; i++)
         {
-            size_t avail;
-            size_t total;
-            cudaSetDevice(dev);
-            cudaMemGetInfo(&avail, &total);
-            cudaDeviceReset();
-            if (avail > max_avail)
+            nvmlDevice_t device;
+            nvmlMemory_t mem;
+            
+            nvmlDeviceGetHandleByIndex(i, &device);
+            nvmlDeviceGetMemoryInfo(device, &mem);
+            
+            
+            if (mem.free > max_avail)
             {
-                max_dev = dev;
-                max_avail = avail;
+                max_dev = i;
+                max_avail = mem.free;
             }
         }
+        nvmlShutdown();
         cudaSetDevice(max_dev);
     }
-    
+#endif
     struct svm_node **x_space = (struct svm_node **)malloc(sizeof(struct svm_node *) * h_prob->l);
     
     struct svm_problem *subprobs;

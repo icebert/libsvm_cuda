@@ -5,6 +5,11 @@ NFLAGS = -ccbin $(CXX) -Xcompiler -Wall,-Wconversion,-fPIC,-fopenmp,-fpermissive
 SHVER = 2
 OS = $(shell uname)
 
+ifeq ($(NVML_LIB),)
+NVML_FLAGS = 
+else
+NVML_FLAGS = -lnvidia-ml -L $(NVML_LIB) -Xcompiler -DNVML
+endif
 
 # Gencode arguments
 SMS ?= 30 35 37 50 52
@@ -37,9 +42,9 @@ lib: svm.o cuda_svm.o
 	$(CXX) $(CFLAGS) $${SHARED_LIB_FLAG} svm.o cuda_svm.o -o libsvm.so.$(SHVER)
 
 svm-predict: svm-predict.c svm.o cuda_svm.o
-	$(NVCC) $(NFLAGS) $(GENCODE_FLAGS) svm-predict.c svm.o cuda_svm.o -o svm-predict -lm
+	$(NVCC) $(NFLAGS) $(GENCODE_FLAGS) $(NVML_FLAGS) svm-predict.c svm.o cuda_svm.o -o svm-predict -lm
 svm-train-gpu: svm-train.o svm.o cuda_svm.o
-	$(NVCC) $(NFLAGS) $(GENCODE_FLAGS) svm-train.o svm.o cuda_svm.o -o svm-train-gpu -lm
+	$(NVCC) $(NFLAGS) $(GENCODE_FLAGS) $(NVML_FLAGS) svm-train.o svm.o cuda_svm.o -o svm-train-gpu -lm
 svm-train.o: svm-train.c
 	$(CXX) $(CFLAGS) -c svm-train.c
 svm-scale: svm-scale.c
@@ -47,7 +52,7 @@ svm-scale: svm-scale.c
 svm.o: svm.cpp svm.h
 	$(CXX) $(CFLAGS) -c svm.cpp
 cuda_svm.o: cuda_svm.cu cuda_svm.h
-	$(NVCC) $(NFLAGS) $(GENCODE_FLAGS) -c cuda_svm.cu
+	$(NVCC) $(NFLAGS) $(GENCODE_FLAGS) $(NVML_FLAGS) -c cuda_svm.cu
 clean:
 	rm -f *~ svm.o cuda_svm.o svm-train.o svm-train-gpu svm-predict svm-scale libsvm.so.$(SHVER)
 
