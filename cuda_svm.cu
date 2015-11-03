@@ -2993,6 +2993,7 @@ int cuda_svm_train(const struct svm_problem *h_prob, struct svm_problem *h_subpr
          return 1;
     }
     
+    
     struct svm_node **x_space = (struct svm_node **)malloc(sizeof(struct svm_node *) * h_prob->l);
     
     struct svm_problem *subprobs;
