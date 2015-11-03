@@ -2992,7 +2992,28 @@ int cuda_svm_train(const struct svm_problem *h_prob, struct svm_problem *h_subpr
          fprintf(stderr, "No CUDA device\n");
          return 1;
     }
-    
+    if (dev_cnt > 1)
+    {
+        //
+        // Choose device that has maximum device memory left
+        //
+        int dev;
+        int max_dev;
+        int max_avail = 0;
+        for (dev=0; dev<dev_cnt; dev++)
+        {
+            size_t avail;
+            size_t total;
+            cudaSetDevice(dev);
+            cudaMemGetInfo(&avail, &total);
+            if (avail > max_avail)
+            {
+                max_dev = dev;
+                max_avail = avail;
+            }
+        }
+        cudaSetDevice(max_dev);
+    }
     
     struct svm_node **x_space = (struct svm_node **)malloc(sizeof(struct svm_node *) * h_prob->l);
     
