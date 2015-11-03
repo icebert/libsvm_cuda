@@ -4,6 +4,7 @@
 
 #define DEVICE_HEAP_SIZE 3*1024*1024*1024L
 
+#define WARP_SIZE 32
 
 
 int cuda_svm_train(const struct svm_problem *prob, struct svm_problem *subprobs, struct svm_parameter *params, int nr_grid, int nr_fold, struct svm_model *submodels);

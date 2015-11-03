@@ -2964,10 +2964,14 @@ __global__ void cuda_svm_train_kernel(const struct svm_problem *subprobs, const 
     int x = blockIdx.x;
     int y = threadIdx.x;
     
-    if (x<nr_grid && y<nr_fold)
+    if (y%WARP_SIZE == 0)
     {
-        struct svm_model *row = (struct svm_model *)((char*)submodels + x * pitch);
-        cuda_perform_svm_train(&(subprobs[y]), &(params[x]), &(row[y]));
+        y = y / WARP_SIZE;
+        if (x<nr_grid && y<nr_fold)
+        {
+            struct svm_model *row = (struct svm_model *)((char*)submodels + x * pitch);
+            cuda_perform_svm_train(&(subprobs[y]), &(params[x]), &(row[y]));
+        }
     }
 }
 
@@ -3118,7 +3122,7 @@ int cuda_svm_train(const struct svm_problem *h_prob, struct svm_problem *h_subpr
     // Run the kernel
     //
     cudaDeviceSetLimit(cudaLimitMallocHeapSize, DEVICE_HEAP_SIZE);
-    cuda_svm_train_kernel<<<nr_grid, nr_fold>>>(subprobs, params, submodels, pitch, nr_grid, nr_fold);
+    cuda_svm_train_kernel<<<nr_grid, nr_fold*WARP_SIZE>>>(subprobs, params, submodels, pitch, nr_grid, nr_fold);
     
     
     if (cudaGetLastError() == cudaSuccess)
